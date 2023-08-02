@@ -30,37 +30,34 @@ const client = new MongoClient(uri, {
     }
 });
 
-async function getAvgRating(mongoClient) {
-    const avgRating = await mongoClient.db(dbname)
-        .collection("review").aggregate([
-            {
-                $group: {
-                    _id: '$movieId',
-                    avgRating: { $avg: '$rating' }
-                }
-            }
-        ]).toArray();
-    return avgRating[0];
-}
-
-async function updateAvgRating(mongoClient, id, newAvgRating) {
-    console.log(id, newAvgRating);
-    const res = await mongoClient.db(dbname)
-        .collection("movies").updateOne(
-            { movieId: id },
-            { $set: { avgRating: newAvgRating } },
-            { upsert: true }
-        )
-    return res;
-}
-
 app.get("/", async (req, res) => {
     try {
         await client.connect();
         const data = await client.db(dbname)
             .collection("movies")
-            .find()
-            .toArray();
+            .aggregate([
+                {
+                  $lookup: {
+                    from: 'review',
+                    localField: 'movieId',
+                    foreignField: 'movieId',
+                    as: 'reviews'
+                  }
+                },
+                {
+                  $project: {
+                    _id: 1,
+                    movieId: 1,
+                    title: 1,
+                    overview: 1,
+                    imageUrl: 1,
+                    releaseDate: 1,
+                    backdropUrl: 1,
+                    avgRating: { $avg: '$reviews.rating' }
+                  }
+                }
+              ]).toArray();
+          
         res.json(data);
     }
     catch (error) {
@@ -116,11 +113,6 @@ app.post("/movie/:id/review", async (req, res) => {
                 rating: parseInt(req.body.rating),
                 reviewTimestamp: req.body.timestamp
             })
-        const avgRating = await getAvgRating(client);
-        const updateRes = await updateAvgRating(client, avgRating._id, avgRating.avgRating)
-        console.log(res);
-        console.log(avgRating);
-        console.log(updateRes);
         resp.posted = true;
         resp.message = "Posted review";
     }
