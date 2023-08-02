@@ -4,7 +4,7 @@ import cors from "cors";
 import { MongoClient, ServerApiVersion } from "mongodb";
 
 const app = express();
-const port = 7000;
+const port = 3000;
 const corsOptions = {
     origin: '*',
     credentials: true,            //access-control-allow-credentials:true
