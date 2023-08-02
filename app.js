@@ -154,6 +154,10 @@ app.post("/login", async (req, res) => {
                 response.message = failMsg;
             }
         }
+        else if (data.length == 0) {
+            res.status(401)
+            response['message'] = failMsg;
+        } 
         else {
             res.status(500)
             response['message'] = "More than one user with same name";
