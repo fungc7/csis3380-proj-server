@@ -191,6 +191,10 @@ app.post("/createaccount", async (req, res) => {
     }
 })
 
+app.get("/test", (req, res) => {
+    res.json({message: "Hello World."});
+})
+
 app.listen(port, () => {
     console.log(`App running on ${port}`);
 });
