@@ -13,6 +13,7 @@ const corsOptions = {
 const USER = process.env.USER;
 const PASSWORD = process.env.PASSWORD;
 const DOMAIN = process.env.MONGODB_DOMAIN;
+const port = process.env.PORT;
 
 app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -194,6 +195,6 @@ app.get("/test", (req, res) => {
     res.json({message: "Hello World."});
 })
 
-app.listen(3000, () => {
-    console.log(`App running on 3000`);
+app.listen(port, () => {
+    console.log(`App running on ${port}`);
 });
